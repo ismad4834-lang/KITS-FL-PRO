@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>KITS FL PRO</title>
+
+<style>
+
+*{
+box-sizing:border-box;
+font-family:Arial, sans-serif;
+}
+
+body{
+margin:0;
+background:#078bd0;
+color:white;
+padding-bottom:80px;
+}
+
+header{
+text-align:center;
+padding:25px;
+}
+
+header h1{
+font-size:35px;
+margin:0;
+}
+
+.container{
+padding:15px;
+}
+
+.menu{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+height:70px;
+background:white;
+display:flex;
+justify-content:space-around;
+align-items:center;
+}
+
+.menu button{
+background:none;
+color:#078bd0;
+font-weight:bold;
+}
+
+button{
+border:none;
+border-radius:12px;
+padding:12px;
+margin:5px;
+cursor:pointer;
+}
+
+.box{
+background:rgba(255,255,255,0.15);
+border-radius:20px;
+padding:15px;
+margin-bottom:15px;
+}
+
+.item{
+background:rgba(0,0,0,.2);
+border-radius:12px;
+padding:12px;
+margin:10px 0;
+}
+
+input,select{
+width:100%;
+padding:12px;
+border-radius:10px;
+border:0;
+margin:5px 0;
+}
+
+.admin{
+display:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<header>
+<h1>⚽ KITS FL PRO</h1>
+</header>
+
+
+<div class="container">
+
+
+<div class="box">
+<h2>🏆 LIGAS</h2>
+
+<div id="ligas">
+No hay ligas todavía
+</div>
+
+</div>
+
+
+
+<div class="box admin">
+
+<h2>🔐 ADMIN</h2>
+
+<input id="ligaNombre" placeholder="Nombre de liga">
+
+<button onclick="crearLiga()">
+➕ Crear Liga
+</button>
+
+
+<input id="equipoNombre" placeholder="Nombre del equipo">
+
+<button onclick="crearEquipo()">
+⚽ Crear Equipo
+</button>
+
+
+<input id="kitNombre" placeholder="Nombre del kit">
+
+<input id="kitLink" placeholder="Enlace del kit">
+
+<button onclick="crearKit()">
+👕 Añadir Kit
+</button>
+
+
+</div>
+
+
+<button onclick="activarAdmin()">
+🔐 Entrar Admin
+</button>
+
+
+</div>
+
+
+<div class="menu">
+
+<button>🏠 HOME</button>
+<button>⚽ CLUB</button>
+<button>🌎 NAT</button>
+<button>💰 DONATE</button>
+
+</div>
+
+  function crearKit(){
+
+let equipoNombre =
+prompt("Nombre del equipo:");
+
+for(let liga of datos.ligas){
+
+let equipo =
+liga.equipos.find(
+e=>e.nombre===equipoNombre
+);
+
+
+if(equipo){
+
+let nombre =
+document.getElementById("kitNombre").value;
+
+
+let link =
+document.getElementById("kitLink").value;
+
+
+equipo.kits.push({
+
+nombre:nombre,
+link:link
+
+});
+
+
+guardar();
+mostrar();
+
+return;
+
+}
+
+}
+
+alert("Equipo no encontrado");
+
+}
+
+
+
+
+function copiarLink(link){
+
+navigator.clipboard.writeText(link);
+
+alert("Enlace copiado 📋");
+
+}
+
+
+
+
+
+function eliminarKit(l,e,k){
+
+datos.ligas[l]
+.equipos[e]
+.kits.splice(k,1);
+
+guardar();
+mostrar();
+
+}
+
+
+
+
+function mostrar(){
+
+let contenedor =
+document.getElementById("ligas");
+
+
+if(datos.ligas.length===0){
+
+contenedor.innerHTML =
+"No hay ligas todavía";
+
+return;
+
+}
+
+
+contenedor.innerHTML="";
+
+
+datos.ligas.forEach((liga,li)=>{
+
+
+let html = `
+
+<div class="item">
+
+<h3>🏆 ${liga.nombre}</h3>
+
+`;
+
+
+
+liga.equipos.forEach((equipo,ei)=>{
+
+
+html += `
+
+<p>⚽ ${equipo.nombre}</p>
+
+`;
+
+
+
+equipo.kits.forEach((kit,ki)=>{
+
+
+html += `
+
+<div>
+
+👕 ${kit.nombre}
+
+<br>
+
+<button onclick="copiarLink('${kit.link}')">
+
+📋 Copiar enlace
+
+</button>
+
+
+<button onclick="eliminarKit(${li},${ei},${ki})">
+
+🗑️
+
+</button>
+
+
+</div>
+
+`;
+
+});
+
+
+});
+
+
+html += "</div>";
+
+contenedor.innerHTML += html;
+
+
+});
+
+
+}
+
+
+
+mostrar();
+
+
+</script>
+
+  <script>
+
+let datos = JSON.parse(localStorage.getItem("kitsFLPro")) || {
+ ligas:[]
+};
+
+
+function guardar(){
+ localStorage.setItem(
+ "kitsFLPro",
+ JSON.stringify(datos)
+ );
+}
+
+
+function activarAdmin(){
+
+let clave = prompt("Clave:");
+
+if(clave==="kitsflpro"){
+
+document.querySelector(".admin").style.display="block";
+
+alert("Administrador activado");
+
+}else{
+
+alert("Clave incorrecta");
+
+}
+
+}
+
+
+
+function crearLiga(){
+
+let nombre =
+document.getElementById("ligaNombre").value;
+
+
+if(nombre){
+
+datos.ligas.push({
+
+nombre:nombre,
+equipos:[]
+
+});
+
+
+guardar();
+mostrar();
+
+}
+
+}
+
+
+
+
+function crearEquipo(){
+
+let liga = prompt(
+"¿En qué liga va el equipo?"
+);
+
+
+let encontrado =
+datos.ligas.find(
+l=>l.nombre===liga
+);
+
+
+if(encontrado){
+
+
+let equipo =
+document.getElementById("equipoNombre").value;
+
+
+encontrado.equipos.push({
+
+nombre:equipo,
+kits:[]
+
+});
+
+
+guardar();
+mostrar();
+
+
+}else{
+
+alert("Liga no encontrada");
+
+}
+
+}
+
+</script>
+    
+</body>
+
+</html>
